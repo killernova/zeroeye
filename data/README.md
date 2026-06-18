@@ -52,3 +52,64 @@ gpg -d backup/tent_production_20240101.sql.gz | gunzip | psql -h localhost tent_
 ```
 
 The GPG key ID is stored in the team vault under `secret/database/backup-key`.
+
+## Test Data Generator
+
+The `tools/data_generator.py` script generates realistic test data (users, orders,
+trades, ticks, and candles) for development and staging environments.
+
+### Deterministic Seed
+
+The generator produces **byte-for-byte identical output** when the same seed and
+arguments are used. This is useful for reproducible test scenarios and CI pipelines.
+
+#### Using a fixed seed
+
+```bash
+# Generate data with seed 42 (explicit)
+python3 tools/data_generator.py --seed 42 -o test_data/
+
+# Same command again produces identical output
+python3 tools/data_generator.py --seed 42 -o test_data/
+```
+
+#### Auto-generated seed with --print-seed
+
+When no `--seed` is provided, the generator creates a random seed and prints it
+to stderr so the run can be reproduced later:
+
+```bash
+# Auto-generate a seed (printed to stderr)
+python3 tools/data_generator.py -o test_data/
+# stderr: SEED: 1847293056
+
+# Reproduce the exact same output
+python3 tools/data_generator.py --seed 1847293056 -o test_data/
+```
+
+Use `--print-seed` to explicitly request the seed be printed even when providing one:
+
+```bash
+python3 tools/data_generator.py --seed 42 --print-seed -o test_data/
+# stderr: SEED: 42
+```
+
+#### Seed metadata in JSON output
+
+JSON exports include a `metadata` block with the seed used:
+
+```json
+{
+  "metadata": {
+    "seed": 42,
+    "generator": "data_generator.py"
+  },
+  "data": [ ... ]
+}
+```
+
+#### Running tests
+
+```bash
+python3 -m pytest tools/test_data_generator.py -v
+```

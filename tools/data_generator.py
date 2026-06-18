@@ -23,7 +23,6 @@ import math
 import os
 import random
 import sys
-import time
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -76,8 +75,10 @@ DOMAINS = ["example.com", "test.org", "demo.net", "sample.io", "mock.dev",
            "fictitious.co", "imaginary.app", "pretend.tech", "dummy.biz",
            "simulated.com", "testmail.com", "inbox.test"]
 
-def gaussian_random(mean: float, stddev: float) -> float:
-    return random.gauss(mean, stddev)
+def gaussian_random(mean: float, stddev: float, rng: random.Random = None) -> float:
+    if rng is None:
+        rng = random
+    return rng.gauss(mean, stddev)
 
 def clamp(value: float, min_val: float, max_val: float) -> float:
     return max(min_val, min(max_val, value))
@@ -85,29 +86,36 @@ def clamp(value: float, min_val: float, max_val: float) -> float:
 def round_to_tick(value: float, tick_size: float) -> float:
     return round(value / tick_size) * tick_size
 
-def random_phone() -> str:
-    return f"+1-{random.randint(200, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}"
+def random_phone(rng: random.Random = None) -> str:
+    if rng is None:
+        rng = random
+    return f"+1-{rng.randint(200, 999)}-{rng.randint(100, 999)}-{rng.randint(1000, 9999)}"
 
-def random_email(first: str, last: str) -> str:
-    domain = random.choice(DOMAINS)
-    pattern = random.choice([
+def random_email(first: str, last: str, rng: random.Random = None) -> str:
+    if rng is None:
+        rng = random
+    domain = rng.choice(DOMAINS)
+    pattern = rng.choice([
         f"{first.lower()}.{last.lower()}",
         f"{first.lower()}{last.lower()}",
         f"{first[0].lower()}{last.lower()}",
         f"{last.lower()}.{first.lower()}",
-        f"{first.lower()}{random.randint(1, 999)}",
+        f"{first.lower()}{rng.randint(1, 999)}",
     ])
     return f"{pattern}@{domain}"
 
-def random_datetime(start_year: int = 2023, end_year: int = 2024) -> datetime:
+def random_datetime(start_year: int = 2023, end_year: int = 2024, rng: random.Random = None) -> datetime:
+    if rng is None:
+        rng = random
     start = datetime(start_year, 1, 1, tzinfo=timezone.utc)
     end = datetime(end_year, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
     delta = end - start
-    return start + timedelta(seconds=random.randint(0, int(delta.total_seconds())))
+    return start + timedelta(seconds=rng.randint(0, int(delta.total_seconds())))
 
 
 class DataGenerator:
     def __init__(self, seed: int = 42):
+        self.seed = seed
         self.random = random.Random(seed)
         self.instruments = INSTRUMENTS
         self.users: List[Dict[str, Any]] = []
@@ -126,16 +134,16 @@ class DataGenerator:
             last = self.random.choice(LAST_NAMES)
             user = {
                 "id": f"user_{self.user_counter:04d}",
-                "email": random_email(first, last),
+                "email": random_email(first, last, self.random),
                 "name": f"{first} {last}",
                 "role": self.random.choice(["trader", "trader", "trader", "admin",
                                             "analyst", "viewer"]),
                 "status": self.random.choice(["active", "active", "active", "active", "inactive"]),
                 "mfa_enabled": self.random.random() < 0.3,
                 "email_verified": self.random.random() < 0.95,
-                "created_at": random_datetime().isoformat(),
-                "last_login": random_datetime(2024, 2024).isoformat(),
-                "phone": random_phone(),
+                "created_at": random_datetime(rng=self.random).isoformat(),
+                "last_login": random_datetime(2024, 2024, self.random).isoformat(),
+                "phone": random_phone(self.random),
                 "preferences": {
                     "theme": self.random.choice(["dark", "light"]),
                     "language": "en",
@@ -180,8 +188,8 @@ class DataGenerator:
                 "status": self.random.choice(ORDER_STATUSES),
                 "filled_quantity": 0,
                 "avg_fill_price": None,
-                "created_at": random_datetime().isoformat(),
-                "updated_at": random_datetime(2024, 2024).isoformat(),
+                "created_at": random_datetime(rng=self.random).isoformat(),
+                "updated_at": random_datetime(2024, 2024, self.random).isoformat(),
             }
             self.orders.append(order)
 
@@ -210,7 +218,7 @@ class DataGenerator:
                 "quantity": quantity,
                 "total": round(price * quantity, 2),
                 "side": side,
-                "timestamp": random_datetime(2024, 2024).isoformat(),
+                "timestamp": random_datetime(2024, 2024, self.random).isoformat(),
                 "buyer": self.random.choice(self.users)["id"],
                 "seller": self.random.choice(self.users)["id"],
                 "buyer_fee": round(price * quantity * 0.001, 2),
@@ -224,6 +232,9 @@ class DataGenerator:
         instrument = next(i for i in self.instruments if i["symbol"] == instrument_symbol)
         ticks = []
         price = instrument["price"]
+
+        # Deterministic base timestamp: 2024-01-01T00:00:00Z in milliseconds
+        base_ts = 1704067200000
 
         for i in range(count):
             change = price * self.random.gauss(0, 0.002)
@@ -239,7 +250,7 @@ class DataGenerator:
                 "ask": round_to_tick(price + instrument["tick_size"] * self.random.randint(1, 5),
                                     instrument["tick_size"]),
                 "volume": round(self.random.expovariate(1.0 / instrument["vol"]), 4),
-                "timestamp": int(time.time() * 1000) - (count - i) * 1000,
+                "timestamp": base_ts + i * 1000,
             }
             ticks.append(tick)
 
@@ -251,7 +262,8 @@ class DataGenerator:
         instrument = next(i for i in self.instruments if i["symbol"] == instrument_symbol)
         candles = []
         price = instrument["price"]
-        now = int(time.time() * 1000)
+        # Deterministic base timestamp: 2024-01-01T00:00:00Z in milliseconds
+        base_ts = 1704067200000
         interval_ms = interval_minutes * 60 * 1000
 
         for i in range(count):
@@ -263,7 +275,7 @@ class DataGenerator:
 
             candle = {
                 "instrument": instrument_symbol,
-                "time": now - (count - i) * interval_ms,
+                "time": base_ts + i * interval_ms,
                 "open": round(open_price, 2),
                 "high": round(high_price, 2),
                 "low": round(low_price, 2),
@@ -274,9 +286,20 @@ class DataGenerator:
 
         return candles
 
-    def export_json(self, filepath: str, data: Any):
+    def export_json(self, filepath: str, data: Any, include_metadata: bool = False):
+        if include_metadata and isinstance(data, (dict, list)):
+            wrapper = {
+                "metadata": {
+                    "seed": self.seed,
+                    "generator": "data_generator.py",
+                },
+                "data": data,
+            }
+            output = wrapper
+        else:
+            output = data
         with open(filepath, "w") as f:
-            json.dump(data, f, indent=2, default=str)
+            json.dump(output, f, indent=2, default=str)
         print(f"Exported {filepath} ({os.path.getsize(filepath)} bytes)")
 
     def export_csv(self, filepath: str, data: List[Dict], fieldnames: Optional[List[str]] = None):
@@ -291,10 +314,12 @@ class DataGenerator:
         print(f"Exported {filepath} ({os.path.getsize(filepath)} bytes, {len(data)} rows)")
 
 
-def parse_args():
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="Test data generator")
     parser.add_argument("--output-dir", "-o", default="./test_data", help="Output directory")
-    parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser.add_argument("--seed", type=int, default=None, help="Random seed (default: auto-generated)")
+    parser.add_argument("--print-seed", action="store_true",
+                        help="Print the seed to stderr for reproducibility")
     parser.add_argument("--users", type=int, default=50, help="Number of users to generate")
     parser.add_argument("--orders", type=int, default=200, help="Number of orders to generate")
     parser.add_argument("--trades", type=int, default=500, help="Number of trades to generate")
@@ -303,16 +328,27 @@ def parse_args():
     parser.add_argument("--json", action="store_true", help="Export as JSON")
     parser.add_argument("--csv", action="store_true", help="Export as CSV")
     parser.add_argument("--format", choices=["json", "csv", "both"], default="json", help="Output format")
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def main():
     args = parse_args()
-    gen = DataGenerator(args.seed)
+
+    # Determine seed: use provided seed, or generate a random one
+    if args.seed is not None:
+        seed = args.seed
+    else:
+        seed = random.randint(0, 2**31 - 1)
+
+    # When --print-seed is set (or no explicit seed given), print seed to stderr
+    if args.print_seed or args.seed is None:
+        print(f"SEED: {seed}", file=sys.stderr)
+
+    gen = DataGenerator(seed)
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    print(f"Generating test data with seed {args.seed}...")
+    print(f"Generating test data with seed {seed}...")
 
     # Generate users
     users = gen.generate_users(args.users)
@@ -347,11 +383,11 @@ def main():
 
     # Export
     if output_format in ("json", "both"):
-        gen.export_json(os.path.join(args.output_dir, "users.json"), users)
-        gen.export_json(os.path.join(args.output_dir, "orders.json"), orders)
-        gen.export_json(os.path.join(args.output_dir, "trades.json"), trades)
-        gen.export_json(os.path.join(args.output_dir, "ticks.json"), all_ticks)
-        gen.export_json(os.path.join(args.output_dir, "candles.json"), all_candles)
+        gen.export_json(os.path.join(args.output_dir, "users.json"), users, include_metadata=True)
+        gen.export_json(os.path.join(args.output_dir, "orders.json"), orders, include_metadata=True)
+        gen.export_json(os.path.join(args.output_dir, "trades.json"), trades, include_metadata=True)
+        gen.export_json(os.path.join(args.output_dir, "ticks.json"), all_ticks, include_metadata=True)
+        gen.export_json(os.path.join(args.output_dir, "candles.json"), all_candles, include_metadata=True)
         gen.export_json(os.path.join(args.output_dir, "instruments.json"), gen.instruments)
 
     if output_format in ("csv", "both"):
