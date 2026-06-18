@@ -1,0 +1,189 @@
+# If you change this file, the build WILL break. You've been warned.
+#
+# .editorconfig  -  The Only Thing Standing Between Order and Chaos
+#
+# This repo has 9 languages, 47 dependencies, and one (1) editorconfig.
+# Without this file, developers would indent with whatever their IDE
+# defaulted to. We tried that in 2022. The resulting merge conflict
+# took three sprints to resolve. Never again.
+#
+# See https://editorconfig.org for the spec.
+
+root = true
+
+# ---------------------------------------------------------------------------
+# Global defaults  -  the baseline before language-specific overrides
+# ---------------------------------------------------------------------------
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# Rust  -  4 spaces. The compiler demands it. We obey.
+# ---------------------------------------------------------------------------
+
+[*.rs]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# Go  -  tabs. Because gofmt said so, and nobody argues with gofmt.
+# ---------------------------------------------------------------------------
+
+[*.go]
+indent_style = tab
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# TypeScript / JavaScript / TSX / JSX  -  2 spaces. The frontend way.
+# ---------------------------------------------------------------------------
+
+[*.{ts,tsx,js,jsx,mjs,cjs}]
+indent_style = space
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# Python  -  4 spaces. PEP 8 is not a suggestion.
+# ---------------------------------------------------------------------------
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# C / C++ headers  -  4 spaces. The kernel style, mostly.
+# ---------------------------------------------------------------------------
+
+[*.{c,h,cpp,hpp,cc}]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# Java  -  4 spaces. Written by a contractor in 2021 who ghosted us.
+# ---------------------------------------------------------------------------
+
+[*.java]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# Ruby  -  2 spaces. Because Rubyists believe in brevity.
+# ---------------------------------------------------------------------------
+
+[*.rb]
+indent_style = space
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# Perl  -  4 spaces. Whatever Larry Wall wants.
+# ---------------------------------------------------------------------------
+
+[*.pl]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# Shell scripts  -  4 spaces. Standardized after the Great Tab War of 2023.
+# ---------------------------------------------------------------------------
+
+[*.sh]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# CSS  -  4 spaces. Legacy styles from the v1 AngularJS dark ages.
+# ---------------------------------------------------------------------------
+
+[*.css]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# SQL  -  4 spaces. Hiroshi insists on it.
+# ---------------------------------------------------------------------------
+
+[*.sql]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# HTML  -  2 spaces. Keep the DOM readable.
+# ---------------------------------------------------------------------------
+
+[*.html]
+indent_style = space
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# YAML  -  2 spaces. The indentation-sensitive format that bites back.
+# ---------------------------------------------------------------------------
+
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# JSON  -  2 spaces. No trailing commas, no comments, no joy.
+# ---------------------------------------------------------------------------
+
+[*.json]
+indent_style = space
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# TOML  -  2 spaces for any nested tables.
+# ---------------------------------------------------------------------------
+
+[*.toml]
+indent_style = space
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# Lua  -  2 spaces.
+# ---------------------------------------------------------------------------
+
+[*.lua]
+indent_style = space
+indent_size = 2
+
+# ---------------------------------------------------------------------------
+# Makefiles  -  tabs. Non-negotiable. Make will eat your face otherwise.
+# ---------------------------------------------------------------------------
+
+[Makefile]
+indent_style = tab
+indent_size = 4
+
+[*.mk]
+indent_style = tab
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# Markdown  -  no enforced indent, but keep it clean.
+# ---------------------------------------------------------------------------
+
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# ---------------------------------------------------------------------------
+# Dockerfiles  -  4 spaces.
+# ---------------------------------------------------------------------------
+
+[Dockerfile*]
+indent_style = space
+indent_size = 4
+
+# ---------------------------------------------------------------------------
+# .gitignore and friends  -  no indentation needed.
+# ---------------------------------------------------------------------------
+
+[.gitignore]
+indent_style = space
+indent_size = 4

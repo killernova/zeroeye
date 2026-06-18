@@ -815,6 +815,39 @@ def print_summary(results: list[tuple[str, bool, float, str, Optional[str]]]):
           f"{color(str(failed) + ' failed', Colors.RED)}, "
           f"{total_time:.1f}s total")
 
+def run_format_check(verbose: bool = False) -> tuple[bool, float, str]:
+    """Run tools/check_format.sh and return (success, elapsed, output)."""
+    script = ROOT / "tools" / "check_format.sh"
+    if not script.exists():
+        return True, 0.0, "check_format.sh not found; skipping format check"
+    start = time.time()
+    cmd = ["bash", str(script)]
+    if verbose:
+        cmd.append("--verbose")
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=str(ROOT),
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+    except subprocess.TimeoutExpired:
+        return False, time.time() - start, "FORMAT CHECK TIMEOUT (120s)"
+    except FileNotFoundError as e:
+        return False, 0.0, f"bash not found: {e}"
+
+    elapsed = time.time() - start
+    output_lines = []
+    if result.stdout:
+        output_lines.append(result.stdout.strip())
+    if result.stderr:
+        output_lines.append(result.stderr.strip())
+    output = "\n".join(output_lines)
+    success = result.returncode == 0
+    return success, elapsed, output
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Tent of Trials  -  Multi-Language Build System",
@@ -928,9 +961,20 @@ Diagnostic bundle:
         return 1
     print(f"  {color('✓ encryptly runs', Colors.GREEN)}")
 
+    print(f"\n  {color('Checking .editorconfig compliance...', Colors.GRAY)}")
+    fmt_ok, fmt_elapsed, fmt_output = run_format_check(args.verbose)
+    if fmt_ok:
+        print(f"  {color('✓ format check passed', Colors.GREEN)}")
+    else:
+        print(f"  {color('⚠ format check found violations', Colors.YELLOW)}")
+        if args.verbose and fmt_output:
+            for line in fmt_output.splitlines()[:10]:
+                print(f"       {color(line, Colors.GRAY)}")
+
     print(f"\n  {color(f'Building {len(selected)} module(s) | release={args.release}', Colors.GRAY)}")
 
     results: list[tuple[str, bool, float, str, Optional[str]]] = []
+    results.append(("format-check", fmt_ok, fmt_elapsed, fmt_output, None))
 
     for module in selected:
         success, elapsed, output = build_module(module, args.release, args.verbose)
