@@ -1,0 +1,117 @@
+{
+  "generated_at": "2026-06-18T03:20:07.987099+00:00",
+  "commit": "94e0fb08",
+  "diagnostic_logd": [
+    "diagnostic/build-94e0fb08-part001.logd",
+    "diagnostic/build-94e0fb08-part002.logd",
+    "diagnostic/build-94e0fb08-part003.logd",
+    "diagnostic/build-94e0fb08-part004.logd",
+    "diagnostic/build-94e0fb08-part005.logd",
+    "diagnostic/build-94e0fb08-part006.logd",
+    "diagnostic/build-94e0fb08-part007.logd",
+    "diagnostic/build-94e0fb08-part008.logd",
+    "diagnostic/build-94e0fb08-part009.logd",
+    "diagnostic/build-94e0fb08-part010.logd",
+    "diagnostic/build-94e0fb08-part011.logd",
+    "diagnostic/build-94e0fb08-part012.logd",
+    "diagnostic/build-94e0fb08-part013.logd",
+    "diagnostic/build-94e0fb08-part014.logd",
+    "diagnostic/build-94e0fb08-part015.logd",
+    "diagnostic/build-94e0fb08-part016.logd",
+    "diagnostic/build-94e0fb08-part017.logd",
+    "diagnostic/build-94e0fb08-part018.logd",
+    "diagnostic/build-94e0fb08-part019.logd",
+    "diagnostic/build-94e0fb08-part020.logd",
+    "diagnostic/build-94e0fb08-part021.logd",
+    "diagnostic/build-94e0fb08-part022.logd"
+  ],
+  "diagnostic_logd_error": null,
+  "message_blocker": null,
+  "chunked": true,
+  "chunk_size_bytes": 41943040,
+  "password": "a7c307068d1e4c0a472e",
+  "decrypt_command": "encryptly unpack diagnostic/build-94e0fb08.logd <outdir> --password a7c307068d1e4c0a472e",
+  "total_modules": 11,
+  "passed": 7,
+  "failed": 4,
+  "modules": [
+    {
+      "name": "format-check",
+      "status": "PASS",
+      "elapsed_seconds": 2.528,
+      "artifact": null,
+      "output": "\u001b[0;36m[INFO]\u001b[0m  editorconfig-checker not found; using built-in heuristic checks\n\u001b[0;36m[INFO]\u001b[0m  Install editorconfig-checker for full validation: https://github.com/editorconfig-checker/editorconfig-checker\n\n\u001b[0;32m[OK]\u001b[0m    All 157 checked files comply with .editorconfig"
+    },
+    {
+      "name": "backend",
+      "status": "FAIL",
+      "elapsed_seconds": 0,
+      "artifact": null,
+      "output": "Command not found: [Errno 2] No such file or directory: 'cargo'"
+    },
+    {
+      "name": "frontend",
+      "status": "PASS",
+      "elapsed_seconds": 6.285,
+      "artifact": "/Users/killernova/Documents/\u4ee3\u7801\u8d4f\u91d1\u4efb\u52a1/repos/zeroeye/frontend/dist",
+      "output": "> tent-frontend@0.0.0 build\n> tsc -b && vite build\n\nvite v6.4.3 building for production...\ntransforming...\n\u2713 100 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.62 kB \u2502 gzip:  0.34 kB\ndist/assets/state-BkjSKDbY.js     8.91 kB \u2502 gzip:  3.55 kB \u2502 map:    57.15 kB\ndist/assets/vendor-CREcWLHI.js   48.93 kB \u2502 gzip: 17.22 kB \u2502 map:   481.27 kB\ndist/assets/index-CyxcoTyU.js   231.32 kB \u2502 gzip: 72.02 kB \u2502 map: 1,044.42 kB\n\u2713 built in 540ms\nnpm warn Unknown user config \"disturl\". This will stop working in the next major version of npm.\nnpm warn Unknown user config \"sass_binary_site\". This will stop working in the next major version of npm.\nnpm warn Unknown user config \"electron_mirror\". This will stop working in the next major version of npm.\nnpm warn Unknown user config \"puppeteer_download_host\". This will stop working in the next major version of npm.\nnpm warn Unknown user config \"chromedriver_cdnurl\". This will stop working in the next major version of npm.\nnpm warn Unknown user config \"operadriver_cdnurl\". This will stop working in the next major version of npm.\nnpm warn Unknown user config \"phantomjs_cdnurl\". This will stop working in the next major version of npm.\nnpm warn Unknown user config \"selenium_cdnurl\". This will stop working in the next major version of npm.\nnpm warn Unknown user config \"node_inspector_cdnurl\". This will stop working in the next major version of npm."
+    },
+    {
+      "name": "market",
+      "status": "PASS",
+      "elapsed_seconds": 1.108,
+      "artifact": "/Users/killernova/Documents/\u4ee3\u7801\u8d4f\u91d1\u4efb\u52a1/repos/zeroeye/market/market",
+      "output": ""
+    },
+    {
+      "name": "frailbox",
+      "status": "FAIL",
+      "elapsed_seconds": 0.233,
+      "artifact": null,
+      "output": "gcc -Wall -Wextra -Wpedantic -std=c2x -O2 -g -D_FORTIFY_SOURCE=3 -fstack-protector-strong -fPIE -Iinclude -MMD -MP -c src/arena.c -o build/src/arena.o\nsrc/arena.c:17:23: error: use of undeclared identifier 'MAP_HUGETLB'\n   17 |         mmap_flags |= MAP_HUGETLB;\n      |                       ^\nsrc/arena.c:179:17: warning: comparison of distinct pointer types ('const void *' and 'char *') [-Wcompare-distinct-pointer-types]\n  179 |             ptr < (char *)region->start + region->size) {\n      |             ~~~ ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n1 warning and 1 error generated.\nmake: *** [build/src/arena.o] Error 1"
+    },
+    {
+      "name": "engine",
+      "status": "FAIL",
+      "elapsed_seconds": 0,
+      "artifact": null,
+      "output": "Command not found: [Errno 2] No such file or directory: 'cmake'"
+    },
+    {
+      "name": "compliance",
+      "status": "PASS",
+      "elapsed_seconds": 1.125,
+      "artifact": "/Users/killernova/Documents/\u4ee3\u7801\u8d4f\u91d1\u4efb\u52a1/repos/zeroeye/compliance/build",
+      "output": ""
+    },
+    {
+      "name": "v2-market-stream",
+      "status": "PASS",
+      "elapsed_seconds": 0.08,
+      "artifact": null,
+      "output": "Syntax OK"
+    },
+    {
+      "name": "nfc-scanner",
+      "status": "PASS",
+      "elapsed_seconds": 0.014,
+      "artifact": null,
+      "output": ""
+    },
+    {
+      "name": "openapi-haskell",
+      "status": "FAIL",
+      "elapsed_seconds": 0,
+      "artifact": null,
+      "output": "Command not found: [Errno 2] No such file or directory: 'ghc'"
+    },
+    {
+      "name": "openapi-tools",
+      "status": "PASS",
+      "elapsed_seconds": 0.004,
+      "artifact": null,
+      "output": ""
+    }
+  ],
+  "pr_note": "Include the encrypted diagnostic logd artifact(s): diagnostic/build-94e0fb08-part001.logd, diagnostic/build-94e0fb08-part002.logd, diagnostic/build-94e0fb08-part003.logd, diagnostic/build-94e0fb08-part004.logd, diagnostic/build-94e0fb08-part005.logd, diagnostic/build-94e0fb08-part006.logd, diagnostic/build-94e0fb08-part007.logd, diagnostic/build-94e0fb08-part008.logd, diagnostic/build-94e0fb08-part009.logd, diagnostic/build-94e0fb08-part010.logd, diagnostic/build-94e0fb08-part011.logd, diagnostic/build-94e0fb08-part012.logd, diagnostic/build-94e0fb08-part013.logd, diagnostic/build-94e0fb08-part014.logd, diagnostic/build-94e0fb08-part015.logd, diagnostic/build-94e0fb08-part016.logd, diagnostic/build-94e0fb08-part017.logd, diagnostic/build-94e0fb08-part018.logd, diagnostic/build-94e0fb08-part019.logd, diagnostic/build-94e0fb08-part020.logd, diagnostic/build-94e0fb08-part021.logd, diagnostic/build-94e0fb08-part022.logd. The encrypted .logd is the required diagnostic content for PR review; this JSON file is metadata. Maintainers may ask you to remove these diagnostic artifacts before merging."
+}
