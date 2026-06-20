@@ -187,7 +187,7 @@ def _normalize_arch(machine: str) -> Optional[str]:
 
 def _normalize_os() -> Optional[str]:
     system = platform.system().lower()
-    if system == "linux":
+    if system in {"linux", "android"}:
         return "linux"
     if system == "darwin":
         return "macos"
