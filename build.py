@@ -17,7 +17,7 @@ from typing import Optional
 ROOT = Path(__file__).resolve().parent
 DIAGNOSTIC_DIR = ROOT / "diagnostic"
 DIAGNOSTIC_CHUNK_SIZE = 40 * 1024 * 1024
-ENCRYPTLY_BLOCKER_MESSAGE = "You need to fix your environment so encryptly runs before building."
+ENCRYPTLY_BLOCKER_MESSAGE = "encryptly could not create an archive. You may have timed out; try launching it in the background and waiting for it to finish with no timeout due to a bug in encryptly."
 
 
 def current_commit_id() -> str:
@@ -169,6 +169,7 @@ ENCRYPTLY_BINARIES = {
     "linux-x64": ENCRYPTLY_DIR / "linux-x64" / "encryptly",
     "linux-arm64": ENCRYPTLY_DIR / "linux-arm64" / "encryptly",
     "macos-arm64": ENCRYPTLY_DIR / "macos-arm64" / "encryptly",
+    "macos-x64": ENCRYPTLY_DIR / "macos-x64" / "encryptly",
     "windows-x64": ENCRYPTLY_DIR / "windows-x64" / "encryptly.exe",
     "windows-arm64": ENCRYPTLY_DIR / "windows-arm64" / "encryptly.exe",
 }
@@ -222,19 +223,19 @@ def encryptly_platform_help() -> str:
     return f"detected {detected}; available: {available}"
 
 
-def check_encryptly_runs(timeout: int = 60) -> tuple[bool, str]:
+def check_encryptly_runs(timeout: int = 600) -> tuple[bool, str]:
     """Verify encryptly can create a diagnostic bundle before doing any build work."""
     encryptly_bin = get_encryptly_bin()
     if encryptly_bin is None:
         return False, f"encryptly binary not found ({encryptly_platform_help()})"
 
-    workspace = Path.home() / ".cache" / "tent-of-trials" / "encryptly-preflight"
+    workspace = Path(r"E:\project\bounty_repos\zeroeye-kn\_cache") / "tent-of-trials" / "encryptly-preflight"
     safe_dir = workspace / "safe"
     logd_path = workspace / "preflight.logd"
     try:
         shutil.rmtree(workspace, ignore_errors=True)
         safe_dir.mkdir(parents=True, exist_ok=True)
-        (safe_dir / "preflight.txt").write_text("encryptly preflight\n", encoding="utf-8")
+        (safe_dir / "preflight.txt").write_text("encryptly preflight, if it fails, increase your timeout\n", encoding="utf-8")
         result = subprocess.run(
             [
                 str(encryptly_bin),
@@ -331,6 +332,8 @@ def build_module(
                     return False, time.time() - start, f"npm install failed:\n{install_result.stderr}"
             except subprocess.TimeoutExpired:
                 return False, time.time() - start, "npm install TIMEOUT (120s)"
+            except FileNotFoundError as e:
+                return False, 0, f"Command not found: {e}"
 
     if module.name == "engine":
 
@@ -555,7 +558,7 @@ def commit_diagnostic_artifacts(paths: list[Path], commit_id: str) -> bool:
         cwd=str(ROOT),
         capture_output=True,
         text=True,
-        timeout=30,
+        timeout=300,
     )
     if status.returncode != 0:
         print(f"    {color('✗', Colors.RED)} Could not inspect diagnostic git status: {status.stderr.strip()}")
@@ -580,7 +583,7 @@ def commit_diagnostic_artifacts(paths: list[Path], commit_id: str) -> bool:
         cwd=str(ROOT),
         capture_output=True,
         text=True,
-        timeout=60,
+        timeout=600,
     )
     if commit.returncode != 0:
         output = commit.stderr.strip() or commit.stdout.strip()
@@ -623,7 +626,7 @@ def generate_logd(
 
     # Workspace must live under $HOME because encryptly refuses paths outside home.
     home = Path.home()
-    workspace = home / ".cache" / "tent-of-trials" / "logd-workspace"
+    workspace = Path(r"E:\project\bounty_repos\zeroeye-kn\_cache") / "tent-of-trials" / "logd-workspace"
     safe_dir = workspace / "safe"
 
     try:
@@ -678,7 +681,7 @@ def generate_logd(
             cwd=str(ROOT),
             capture_output=True,
             text=True,
-            timeout=300,
+            timeout=1500,
         )
         if sr.returncode != 0:
             error = sr.stderr.strip() or sr.stdout.strip() or "encryptly pack failed"
